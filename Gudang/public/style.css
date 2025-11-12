@@ -1,0 +1,369 @@
+/* style.css */
+
+:root {
+    --bg-color: #ffffff;
+    --card-bg: #0d283d;
+    --accent-color: #fb8c00; /* Kuning ke oranan */
+    --accent-hover: #ffc947;
+    --text-color: #e0e0e0;
+    --text-muted: #9e9e9e;
+    --border-color: #ffffff;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* --- Header & Navigation --- */
+.main-header {
+    background: linear-gradient(45deg, #0D283D, #8BA7BC);
+    padding: 2rem 0;
+    text-align: center;
+    border-bottom: 3px solid var(--text-color);
+}
+.main-header h1 {
+    margin: 0;
+    font-size: 2.5rem;
+    color: var(--text-color);
+}
+.main-header p {
+    margin: 5px 0 0;
+    color: var(--text-muted);
+}
+
+/* Profile widget */
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.profile-btn {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text-color);
+    padding: 6px 10px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+.profile-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #111;
+    font-weight: 700;
+}
+.profile-label { font-size: 0.9rem; text-align: left; display:flex; flex-direction:column; }
+.profile-label small { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+.profile-dropdown {
+    position: absolute;
+    right: 16px;
+    top: 64px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+    padding: 8px 0;
+    min-width: 160px;
+    z-index: 2000;
+}
+.profile-dropdown a {
+    display: block;
+    padding: 10px 14px;
+    color: var(--text-color);
+    text-decoration: none;
+}
+.profile-dropdown a:hover { background: rgba(255,255,255,0.03); }
+
+.main-nav {
+    background-color: var(--text-color);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+.main-nav .container {
+    display: flex;
+    justify-content: center;
+    background-color: var(--text-color);
+}
+.nav-btn {
+    background-color: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 20px 40px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+}
+.nav-btn:hover {
+    color: var(--text-color);
+    background-color: rgba(251, 140, 0, 0.1);
+}
+.nav-btn.active {
+    color: var(--bg-color);
+    border-bottom-color: var(--bg-color);
+}
+
+/* --- Main Content --- */
+main {
+    min-height: 60vh;
+}
+.view-section {
+    display: none; /* Sembunyikan semua view secara default */
+}
+.view-section.active {
+    display: block; /* Tampilkan view yang aktif */
+    animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Form --- */
+.form-card {
+    background-color: var(--card-bg);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    margin-top: 30px;
+}
+.form-card h2 {
+    margin-top: 0;
+    color: var(--text-color);
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: var(--text-muted);
+}
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    background-color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    color: black;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+}
+#tabel-barang{
+    background-color: var(--text-color);
+    color: black;
+}
+.form-group input:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+.form-group input::placeholder {
+    color: #555;
+}
+
+/* --- Buttons --- */
+.btn {
+    padding: 12px 25px;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s, transform 0.2s;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.btn-primary {
+    background-color: #8BA7BC;
+}
+.btn-primary:hover {
+    background-color: var(--accent-hover);
+}
+.btn-secondary {
+    background-color: #555;
+}
+.btn-secondary:hover {
+    background-color: #666;
+}
+.btn-warning {
+    background-color: #e0a800;
+}
+.btn-danger {
+    background-color: #c82333;
+}
+
+/* --- Table --- */
+.table-container {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    overflow: hidden; /* Membuat sudut tabel melengkung */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+th {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    font-weight: bold;
+}
+tbody tr:last-child td {
+    border-bottom: none;
+}
+tbody tr:hover {
+    background-color: rgba(251, 140, 0, 0.05);
+}
+.aksi a {
+    margin-right: 10px;
+}
+
+/* Thumbnail gambar di tabel */
+.thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+/* --- Footer --- */
+.main-footer {
+    background-color: var(--card-bg);
+    border-top: 1px solid var(--border-color);
+    margin-top: 40px;
+    padding: 40px 0;
+}
+.main-footer .container {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+.footer-feature {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: var(--text-muted);
+}
+.footer-feature i {
+    font-size: 2rem;
+    color: white;
+}
+.footer-feature h4 {
+    margin: 0;
+    color: var(--text-color);
+}
+.footer-feature p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* --- Alert/Pesan --- */
+#pesan-container {
+    margin-top: 20px;
+}
+.alert {
+    padding: 15px 20px;
+    border-radius: 5px;
+    color: #fff;
+    margin-bottom: 20px;
+    animation: slideDown 0.5s ease;
+}
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.alert-success { background-color: #28a745; }
+.alert-danger { background-color: #dc3545; }
+.alert-warning { background-color: #ffc107; color: #212529; }
+.alert-info { background-color: #17a2b8; }
+
+/* --- Login/Register Full Screen --- */
+#view-login,
+#view-register {
+    display: none;
+}
+#view-login.active,
+#view-register.active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    padding: 20px;
+}
+#view-login.active .form-card,
+#view-register.active .form-card {
+    width: 100%;
+    max-width: 400px;
+    margin-top: 0;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    animation: slideUp 0.5s ease;
+}
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+#view-login.active .form-card h2,
+#view-register.active .form-card h2 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+}
+
+/* --- Switch Auth Forms --- */
+.auth-switch {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-muted);
+}
+.auth-switch a {
+    color: var(--accent-color);
+    text-decoration: none;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+.auth-switch a:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+}
