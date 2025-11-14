@@ -21,6 +21,8 @@ window.App = (function() {
     function setupApp() {
         var navTambah = document.getElementById("nav-tambah");
         var navTabel = document.getElementById("nav-tabel");
+        var navRegister = document.getElementById("nav-register");
+        var btnRegisterBack = document.getElementById("btn-register-back");
         var btnLogout = document.getElementById("btn-logout");
 
         if (navTambah) {
@@ -33,6 +35,19 @@ window.App = (function() {
             navTabel.addEventListener("click", function() {
                 switchView("view-tabel");
                 updateNavBar("nav-tabel");
+            });
+        }
+        if (navRegister) {
+            navRegister.addEventListener("click", function() {
+                switchView("view-register");
+                updateNavBar("nav-register");
+            });
+        }
+        if (btnRegisterBack) {
+            btnRegisterBack.addEventListener("click", function() {
+                // go back to main tambah view
+                switchView("view-tambah");
+                updateNavBar("nav-tambah");
             });
         }
         if (btnLogout) {
@@ -73,6 +88,12 @@ window.App = (function() {
                 localStorage.clear();
                 location.reload();
             });
+        }
+
+        // show register nav for admins
+        var navRegister = document.getElementById("nav-register");
+        if (navRegister) {
+            navRegister.style.display = user.role === 'admin' ? 'inline-block' : 'none';
         }
     }
 

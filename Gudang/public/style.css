@@ -161,7 +161,7 @@ main {
     color: var(--text-muted);
 }
 .form-group input {
-    width: 100%;
+    width: 95%;
     padding: 12px;
     background-color: var(--text-color);
     border: 1px solid var(--border-color);
@@ -211,6 +211,26 @@ main {
 .btn-secondary:hover {
     background-color: #666;
 }
+
+/* --- Back button (rounded square, cyan, SVG icon) --- */
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    padding: 8px;
+    background-color: #fb8c00; /* bright cyan */
+    border: none;
+    border-radius: 24px; /* rounded square with 20-30px corners */
+    color: #ffffff;
+    cursor: pointer;
+    transition: background-color 0.12s ease;
+}
+.btn-back svg { display: block; width: 20px; height: 20px; }
+.btn-back:focus { outline: 3px solid rgba(0,184,255,0.18); outline-offset: 2px; }
+.btn-back:hover { background-color: #00A7E6; }
+
 .btn-warning {
     background-color: #e0a800;
 }

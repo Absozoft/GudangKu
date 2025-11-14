@@ -32,12 +32,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // max 5MB
 
 // Middleware untuk menyajikan file statis dari folder 'public'
-app.use(express.static(path.join(__dirname, 'public')));
+// Disable automatic `index.html` serving so EJS root route handles '/'.
+app.use(express.static(path.join(__dirname, 'public'), { index: false }));
 
-// Fallback eksplisit untuk root agar selalu mengirim index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+// NOTE: root is rendered via EJS below (do not send static index.html)
 
 // Inisialisasi database SQLite
 const db = new sqlite3.Database('./gudang.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {

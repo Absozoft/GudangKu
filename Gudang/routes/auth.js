@@ -18,8 +18,15 @@ module.exports = function deps(opts) {
         });
     }
 
-    // Register
-    router.post('/register', (req, res) => {
+    function requireAdmin(req, res, next) {
+        if (!req.user || req.user.role !== 'admin') {
+            return res.status(403).json({ error: 'Akses ditolak: admin saja' });
+        }
+        next();
+    }
+
+    // Register - only admin may create new users
+    router.post('/register', authenticateToken, requireAdmin, (req, res) => {
         const { username, password } = req.body || {};
         if (!username || !password) return res.status(400).json({ error: 'Username dan password diperlukan' });
         const hashed = bcrypt.hashSync(password, 8);

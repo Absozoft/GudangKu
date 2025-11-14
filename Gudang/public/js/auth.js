@@ -25,24 +25,28 @@ window.Auth = (function() {
         var regForm = document.getElementById("form-register");
         if (regForm) {
             regForm.addEventListener("submit", function(e) {
-                e.preventDefault();
-                var username = document.getElementById("reg-username").value;
-                var password = document.getElementById("reg-password").value;
-                fetch("/api/auth/register", {
-                    method: "POST",
-                    headers: {"Content-Type": "application/json"},
-                    body: JSON.stringify({username: username, password: password})
-                })
-                .then(function(r) { return r.json(); })
-                .then(function(data) {
-                    if (data.error) { alert(data.error); return; }
-                    alert("Register berhasil! Silakan login.");
-                    document.getElementById("form-register").reset();
-                    document.getElementById("view-login").classList.add("active");
-                    document.getElementById("view-register").classList.remove("active");
-                })
-                .catch(function(e) { alert("Error: " + e); });
-            });
+                    e.preventDefault();
+                    var currentUser = JSON.parse(localStorage.getItem("gudang_user") || "null");
+                    var token = localStorage.getItem("gudang_token");
+                    if (!currentUser || !token || currentUser.role !== 'admin') {
+                        alert('Akses ditolak: hanya admin yang dapat mendaftarkan pengguna. Silakan login sebagai admin.');
+                        return;
+                    }
+                    var username = document.getElementById("reg-username").value;
+                    var password = document.getElementById("reg-password").value;
+                    fetch("/api/auth/register", {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json", "Authorization": "Bearer " + token},
+                        body: JSON.stringify({username: username, password: password})
+                    })
+                    .then(function(r) { return r.json(); })
+                    .then(function(data) {
+                        if (data.error) { alert(data.error); return; }
+                        alert("Register berhasil!");
+                        document.getElementById("form-register").reset();
+                    })
+                    .catch(function(e) { alert("Error: " + e); });
+                });
         }
 
         var switchReg = document.getElementById("switch-to-register");
