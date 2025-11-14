@@ -99,163 +99,20 @@ const db = new sqlite3.Database('./gudang.db', sqlite3.OPEN_READWRITE | sqlite3.
 });
 
 // --- API ENDPOINTS ---
-
 // JWT secret (in production keep this in env var)
 const JWT_SECRET = process.env.JWT_SECRET || 'gudang_secret_change_me';
 
-// Middleware untuk verifikasi token
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'Token tidak ditemukan' });
-    jwt.verify(token, JWT_SECRET, (err, user) => {
-        if (err) return res.status(403).json({ error: 'Token tidak valid' });
-        req.user = user; // { id, username, role }
-        next();
-    });
-}
+// Set up EJS view engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
 
-function requireAdmin(req, res, next) {
-    if (!req.user || req.user.role !== 'admin') {
-        return res.status(403).json({ error: 'Akses ditolak: admin saja' });
-    }
-    next();
-}
+// Mount modular route handlers
+app.use('/api/auth', require('./routes/auth')({ db, jwt, bcrypt, JWT_SECRET }));
+app.use('/api/barang', require('./routes/barang')({ db, upload, jwt, JWT_SECRET }));
 
-// AUTH: register
-app.post('/api/auth/register', express.json(), (req, res) => {
-    const { username, password } = req.body || {};
-    if (!username || !password) return res.status(400).json({ error: 'Username dan password diperlukan' });
-    const hashed = bcrypt.hashSync(password, 8);
-    db.run(`INSERT INTO users (username, password, role) VALUES (?, ?, 'user')`, [username, hashed], function(err) {
-        if (err) {
-            if (err.message && err.message.includes('UNIQUE')) {
-                return res.status(409).json({ error: 'Username sudah terdaftar' });
-            }
-            return res.status(500).json({ error: 'Gagal membuat user' });
-        }
-        res.json({ message: 'Registrasi berhasil', id: this.lastID });
-    });
-});
-
-// AUTH: login
-app.post('/api/auth/login', express.json(), (req, res) => {
-    const { username, password } = req.body || {};
-    if (!username || !password) return res.status(400).json({ error: 'Username dan password diperlukan' });
-    db.get(`SELECT id, username, password, role FROM users WHERE username = ?`, [username], (err, row) => {
-        if (err) return res.status(500).json({ error: 'Terjadi kesalahan' });
-        if (!row) return res.status(401).json({ error: 'Username atau password salah' });
-        const match = bcrypt.compareSync(password, row.password);
-        if (!match) return res.status(401).json({ error: 'Username atau password salah' });
-        const payload = { id: row.id, username: row.username, role: row.role };
-        const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
-        res.json({ message: 'Login berhasil', token, user: payload });
-    });
-});
-
-// AUTH: get current user
-app.get('/api/auth/me', authenticateToken, (req, res) => {
-    res.json({ user: req.user });
-});
-
-
-// READ: Ambil semua data barang
-app.get('/api/barang', (req, res) => {
-    db.all("SELECT * FROM barang ORDER BY id DESC", [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ data: rows });
-    });
-});
-
-// CREATE: Tambah barang baru (menerima gambar)
-app.post('/api/barang', authenticateToken, upload.single('gambar'), (req, res) => {
-    const { nama_barang } = req.body;
-    const qty = parseInt(req.body.qty, 10);
-    const harga_barang = parseFloat(req.body.harga_barang);
-
-    // Validasi input
-    if (!nama_barang || nama_barang.trim() === '') {
-        return res.status(400).json({ error: "Nama barang tidak boleh kosong" });
-    }
-    if (isNaN(qty) || qty < 0) {
-        return res.status(400).json({ error: "Jumlah barang harus berupa angka bulat positif" });
-    }
-    if (isNaN(harga_barang) || harga_barang < 0) {
-        return res.status(400).json({ error: "Harga barang harus berupa angka positif" });
-    }
-
-    const gambarPath = req.file ? `/uploads/${req.file.filename}` : null;
-
-    db.run(`INSERT INTO barang (nama_barang, qty, harga_barang, gambar) VALUES (?, ?, ?, ?)`,
-        [nama_barang.trim(), qty, harga_barang, gambarPath],
-        function(err) {
-            if (err) {
-                console.error("Error saat menambah barang:", err);
-                res.status(500).json({ error: "Gagal menambah barang ke database" });
-                return;
-            }
-            res.json({ message: "Barang berhasil ditambahkan!", id: this.lastID });
-        }
-    );
-});
-
-// UPDATE: Update data barang (menerima gambar baru opsional)
-app.put('/api/barang/:id', authenticateToken, requireAdmin, upload.single('gambar'), (req, res) => {
-    const { id } = req.params;
-    const { nama_barang } = req.body;
-    const qty = parseInt(req.body.qty, 10);
-    const harga_barang = parseFloat(req.body.harga_barang);
-
-    if (!nama_barang || nama_barang.trim() === '') {
-        return res.status(400).json({ error: "Nama barang tidak boleh kosong" });
-    }
-    if (isNaN(qty) || qty < 0) {
-        return res.status(400).json({ error: "Jumlah barang harus berupa angka bulat positif" });
-    }
-    if (isNaN(harga_barang) || harga_barang < 0) {
-        return res.status(400).json({ error: "Harga barang harus berupa angka positif" });
-    }
-
-    const gambarPath = req.file ? `/uploads/${req.file.filename}` : null;
-
-    if (gambarPath) {
-        db.run(`UPDATE barang SET nama_barang = ?, qty = ?, harga_barang = ?, gambar = ? WHERE id = ?`,
-            [nama_barang.trim(), qty, harga_barang, gambarPath, id],
-            function(err) {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                res.json({ message: "Barang berhasil diperbarui!" });
-            }
-        );
-    } else {
-        db.run(`UPDATE barang SET nama_barang = ?, qty = ?, harga_barang = ? WHERE id = ?`,
-            [nama_barang.trim(), qty, harga_barang, id],
-            function(err) {
-                if (err) {
-                    res.status(500).json({ error: err.message });
-                    return;
-                }
-                res.json({ message: "Barang berhasil diperbarui!" });
-            }
-        );
-    }
-});
-
-// DELETE: Hapus data barang (admin only)
-app.delete('/api/barang/:id', authenticateToken, requireAdmin, (req, res) => {
-    const { id } = req.params;
-    db.run(`DELETE FROM barang WHERE id = ?`, id, function(err) {
-        if (err) {
-            res.status(500).json({ error: err.message });
-            return;
-        }
-        res.json({ message: "Barang berhasil dihapus!" });
-    });
+// Render the main page with EJS (keeps same HTML/UI)
+app.get('/', (req, res) => {
+    res.render('index');
 });
 
 // Jalankan server
