@@ -32,7 +32,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } }); // max 5MB
 
 // Middleware untuk menyajikan file statis dari folder 'public'
-// Sajikan file statis relatif terhadap lokasi file server.js
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Fallback eksplisit untuk root agar selalu mengirim index.html
