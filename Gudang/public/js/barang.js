@@ -98,8 +98,33 @@ window.Barang = (function() {
     function setupBarang() {
         var form = document.getElementById("form-barang");
         if (form) form.addEventListener("submit", handleSubmit);
+        var exportBtn = document.getElementById("export-excel");
+        if (exportBtn) exportBtn.addEventListener("click", exportExcel);
         window.editItem = editItem;
         window.delItem = delItem;
+    }
+
+    function exportExcel() {
+        var token = localStorage.getItem("gudang_token");
+        var headers = {};
+        if (token) headers["Authorization"] = "Bearer " + token;
+
+        fetch('/api/barang/export', { method: 'GET', headers: headers })
+            .then(function(res) {
+                if (!res.ok) throw new Error('Gagal mengunduh file');
+                return res.blob();
+            })
+            .then(function(blob) {
+                var url = window.URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = 'barang.xlsx';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(function(err) { alert('Error: ' + err.message); });
     }
 
     return { loadData, renderTable, handleSubmit, editItem, delItem, setupBarang };

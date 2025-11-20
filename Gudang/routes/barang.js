@@ -1,4 +1,5 @@
 const express = require('express');
+const ExcelJS = require('exceljs');
 
 module.exports = function deps(opts) {
     const router = express.Router();
@@ -33,6 +34,39 @@ module.exports = function deps(opts) {
                 return;
             }
             res.json({ data: rows });
+        });
+    });
+
+    // GET /export - export data to Excel (.xlsx)
+    router.get('/export', authenticateToken, async (req, res) => {
+        db.all("SELECT * FROM barang ORDER BY id DESC", [], async (err, rows) => {
+            if (err) return res.status(500).json({ error: err.message });
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const sheet = workbook.addWorksheet('Barang');
+
+                sheet.columns = [
+                    { header: 'ID', key: 'id', width: 8 },
+                    { header: 'Nama Barang', key: 'nama_barang', width: 32 },
+                    { header: 'Qty', key: 'qty', width: 10 },
+                    { header: 'Harga', key: 'harga_barang', width: 14 },
+                    { header: 'Gambar', key: 'gambar', width: 40 }
+                ];
+
+                rows.forEach(r => {
+                    sheet.addRow({ id: r.id, nama_barang: r.nama_barang, qty: r.qty, harga_barang: r.harga_barang, gambar: r.gambar || '' });
+                });
+
+                sheet.getRow(1).font = { bold: true };
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                res.setHeader('Content-Disposition', 'attachment; filename="barang.xlsx"');
+                res.send(buffer);
+            } catch (ex) {
+                console.error('Error exporting to excel:', ex);
+                res.status(500).json({ error: 'Gagal membuat file Excel' });
+            }
         });
     });
 
